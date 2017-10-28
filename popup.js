@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (prevVal != e.srcElement.value) {
             // if the value has changed, reset the skip count
             skipCount = 0;
-            console.log("Resetting scriptcouunt");
+            console.log("Resetting script count");
         } else {
             // store the value again
             prevVal = e.srcElement.value;
@@ -35,6 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
         sendSearch(e.srcElement.value, skipCount);
     });
 });
+
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+        if (request.clear == true) {
+            console.log("Clearing search and closing popup");
+            document.getElementById('search').value = "";
+            window.close();
+        }
+    }
+);
 
 // send the enter message
 function sendEnter() {

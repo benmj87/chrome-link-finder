@@ -5,6 +5,10 @@ var skipCount = 0;
 // Holds the value to determine if the text was changed
 var prevVal = "";
 
+document.addEventListener('beforeunload', function (e) {
+    sendClearMarkedLinks();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("search").focus();
     document.getElementById("search").addEventListener("keyup", function (e) {
@@ -36,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// listen for messages back from the content scripts
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.clear == true) {
@@ -46,18 +51,26 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-// send the enter message
+// send the enter message to the active tab
 function sendEnter() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        console.log("sending enter");
+        console.log("sending enter to active tab");
         chrome.tabs.sendMessage(tabs[0].id, { enter: true });
     });
 }
 
-// send the search command
+// send the search command to the active tab
 function sendSearch(searchTerm, skipCount) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        console.log("sending msg");
+        console.log("sending search to active tab");
         chrome.tabs.sendMessage(tabs[0].id, { search: searchTerm, skip: skipCount });
+    });
+}
+
+// send the command to clear marked links
+function sendClearMarkedLinks() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        console.log("sending clear marked links to active tab");
+        chrome.tabs.sendMessage(tabs[0].id, { clearLinksMarked: true });
     });
 }
